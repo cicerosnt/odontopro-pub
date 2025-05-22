@@ -57,10 +57,12 @@ model Reminder {
   id          String   @id @default(cuid())
   title       String
   description String
-  date        DateTime
-  time        DateTime
+  
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+  
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id])
 
   @@map("reminders")
 }
