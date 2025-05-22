@@ -3,7 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Loader, LoaderCircleIcon, LoaderPinwheel, LoaderPinwheelIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Loader,
+  LoaderCircleIcon,
+  LoaderPinwheel,
+  LoaderPinwheelIcon,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { DialogService } from "./dialog-service";
 import { Service } from "@/generated/prisma";
@@ -16,66 +24,75 @@ import LoadingSpinner from "@/components/ui/loading";
 import convertSecondsInHors from "@/ultils/convertMinutesInHours";
 
 interface ServicesListProps {
-  services: Service[]
+  services: Service[];
 }
 
 export function ServicesList({ services }: ServicesListProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState<null | Service>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingService, setEditingService] = useState<null | Service>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingPage, setIsLoadingPage] = useState(false)
-  
   async function handleDeleteService(serviceId: string) {
-  
-    setIsLoading(true)
-  
-    const response = await deleteService({ serviceId: serviceId })
-    
+    setIsLoading(true);
+
+    const response = await deleteService({ serviceId: serviceId });
+
     if (response.error) {
-      toast.error(response.error)
-      return
+      toast.error(response.error);
+      return;
     }
-    setIsLoading(false)
-    toast.success(response.data)
+    setIsLoading(false);
+    toast.success(response.data);
   }
-  
+
   function handleEditService(service: Service) {
-    setEditingService(service)
-    setIsDialogOpen(true)
+    setEditingService(service);
+    setIsDialogOpen(true);
   }
-  
-  if(isLoading){
+
+  if (isLoading) {
     return (
       <LoadingSpinner fullscreen={true} size={32} color="border-gray-300" />
-    )
+    );
   }
 
   return !isLoadingPage ? (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open);
+
+        if (!open) {
+          setEditingService(null);
+        }
+      }}
+    >
       <section className="mx-auto">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xl md:text-2xl font-bold">Serviços</CardTitle>
-  
+            <CardTitle className="text-xl md:text-2xl font-bold">
+              Serviços
+            </CardTitle>
+
             <DialogTrigger asChild>
               <Button className="cursor-pointer flex gap-2 items-center">
                 <Plus className="w-4 h-4" />
                 Novo
               </Button>
             </DialogTrigger>
-  
+
             <DialogContent
               onInteractOutside={(e) => {
-                e.preventDefault()
-                setIsDialogOpen(false)
-                setEditingService(null)
+                e.preventDefault();
+                setIsDialogOpen(false);
+                setEditingService(null);
               }}
             >
               <DialogService
                 closeModal={() => {
-                  setIsDialogOpen(false)
-                  setEditingService(null)
+                  setIsDialogOpen(false);
+                  setEditingService(null);
                 }}
                 serviceId={editingService ? editingService.id : undefined}
                 initialValues={
@@ -84,8 +101,10 @@ export function ServicesList({ services }: ServicesListProps) {
                         name: editingService.name,
                         price: (editingService.price / 100)
                           .toFixed(2)
-                          .replace('.', ','),
-                        hours: Math.floor(editingService.duration / 60).toString(),
+                          .replace(".", ","),
+                        hours: Math.floor(
+                          editingService.duration / 60,
+                        ).toString(),
                         minutes: (editingService.duration % 60).toString(),
                       }
                     : undefined
@@ -93,7 +112,7 @@ export function ServicesList({ services }: ServicesListProps) {
               />
             </DialogContent>
           </CardHeader>
-  
+
           <CardContent>
             <section className="space-y-4 mt-5">
               <div className="space-y-2">
@@ -101,8 +120,8 @@ export function ServicesList({ services }: ServicesListProps) {
                   <article
                     key={service.id}
                     className={clsx(
-                      'group/item flex gap-6 md:gap-8 items-center justify-between bg-card p-4 rounded-lg shadow-sm transition-all duration-200 hover:bg-accent/50 group',
-                      { 'bg-gray-400': !service.status }
+                      "group/item flex gap-6 md:gap-8 items-center justify-between bg-card p-4 rounded-lg shadow-sm transition-all duration-200 hover:bg-accent/50 group",
+                      { "bg-gray-400": !service.status },
                     )}
                   >
                     <div className="flex items-center justify-between flex-1 min-w-0">
@@ -118,7 +137,7 @@ export function ServicesList({ services }: ServicesListProps) {
                         {formatCurrency(service.price / 100)}
                       </span>
                     </div>
-  
+
                     <div className="flex gap-2 group/edit invisible group-hover/item:visible">
                       <Button
                         variant="ghost"
@@ -130,7 +149,7 @@ export function ServicesList({ services }: ServicesListProps) {
                         <Pencil className="w-5 h-5" />
                         <span className="sr-only">Editar serviço</span>
                       </Button>
-  
+
                       <Button
                         variant="ghost"
                         title="Excluir"
@@ -152,6 +171,5 @@ export function ServicesList({ services }: ServicesListProps) {
     </Dialog>
   ) : (
     <Placeholder count={5} />
-  )
-
+  );
 }

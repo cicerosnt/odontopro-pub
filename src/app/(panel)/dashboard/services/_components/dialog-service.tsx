@@ -184,7 +184,8 @@ export function DialogService({closeModal, initialValues, serviceId}: DialogServ
                                 <Input 
                                     {...field} 
                                     placeholder="1" 
-                                    min={1}
+                                    min={0}
+                                    max={3}
                                     type="number"
                                     className="py-5 px-3 "
                                 />
@@ -205,7 +206,8 @@ export function DialogService({closeModal, initialValues, serviceId}: DialogServ
                                 <Input 
                                     {...field} 
                                     placeholder="0" 
-                                    min={0 }
+                                    min={0}
+                                    max={59}
                                     type="number"
                                     className="py-5 px-3 "
                                 />

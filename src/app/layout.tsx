@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionAuthProvider } from "@/components/session-auth";
-import { Toaster, toast } from 'sonner'
+import { Toaster, toast } from "sonner";
+import { QueryClientContext } from "@/providers/queryclient";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,15 +25,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="pt-br">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionAuthProvider>
-          <Toaster duration={2500} position="top-right" richColors  />
-          {children}
+          <QueryClientContext>
+            <Toaster duration={2500} position="top-right" richColors />
+            {children}
+          </QueryClientContext>
         </SessionAuthProvider>
       </body>
     </html>
